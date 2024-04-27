@@ -2,7 +2,7 @@
 
 DARK converts standard light-themed plots to a dark color scheme. DARK is easy to use, simply run the command "dark" and the current plot will be rendered in a dark theme. DARK is compatible with MATLAB and GNU Octave.
 
-DARK uses only native functions common to MATLAB and GNU Octave without any dependencies on toolboxes or packages. Because of this it will likely run on most any version. It has been tested with MATLAB versions R2019b, R2020b, R2022b, and R2023b as well as GNU Octave versions 3.8.2, 4.4.0, 5.2.0, and 8.3.0. DARK has been tested on Windows 10 and Linux distros running Centos7, RHEL 8, and Ubuntu 22.04.
+DARK uses only native functions common to MATLAB and GNU Octave without any dependencies on toolboxes or packages. Because of this it will likely run on most any version. It has been tested with MATLAB versions R2019b, R2020b, R2022b, and R2023b as well as GNU Octave versions 3.8.2, 4.4.0, 5.2.0, 6.4.0, 8.3.0, and 9.1.0. DARK has been tested on Windows 10 and Linux distros running Centos7, RHEL 8, and Ubuntu 22.04.
 
 UNDARK is included to restore a dark-themed plot back to its standard light theme. Simply run the command "undark" and the current plot will be rendered in its standard light theme. In short UNDARK undoes DARK.
 

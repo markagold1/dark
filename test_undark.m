@@ -80,3 +80,37 @@ pause(1)
 dark
 pause(2)
 undark
+pause(2)
+
+close all
+t = 0:pi/50:10*pi;
+st = sin(t);
+ct = cos(t);
+plot3(st,ct,t)
+grid on
+xlabel('X')
+ylabel('Y')
+zlabel('Z')
+title('3-d plot')
+pause(1)
+dark
+pause(2)
+undark
+pause(2)
+
+close all
+Z = 10 + peaks;
+surf(Z)
+hold on
+imagesc(Z)
+grid off
+hold off
+xlabel('X')
+ylabel('Y')
+zlabel('Z')
+title('3-d plot on top of imagesc')
+colorbar;
+pause(1)
+dark
+pause(2)
+undark

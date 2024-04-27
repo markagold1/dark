@@ -31,6 +31,8 @@ function dark(colors_in)
 %  Notes:
 %   1. Supported plot types
 %      2-d line plots (plot command)
+%      3-d line plots (plot3 command)
+%      3-d surface plots (surf command)
 %      stem plots (stem command)
 %      bar plots (bar command)
 %      horizontal bar plots (barh command)
@@ -59,7 +61,7 @@ function dark(colors_in)
     draw_canvas();
     graph_data();
     label_axes();
-    handle_legend();
+    handle_adornments();
     finish_up();
 
 end % main function
@@ -70,6 +72,7 @@ function draw_canvas()
     % draw background
     set(gca,'Color','black');
     set(gcf,'Color','black');
+    set(gca,'zcolor','white');
     if isoctave()
         set(gca,'xcolor','white');
         set(gca,'ycolor','white');
@@ -175,9 +178,18 @@ function go_label_axes()
     tt = get(gca,'title');
     xx = get(gca,'xlabel');
     yy = get(gca,'ylabel');
+    zz = get(gca,'zlabel');
     set(tt,'Color','white');
     set(xx,'Color','white');
     set(yy,'Color','white');
+    set(zz,'Color','white');
+
+end % function
+
+function handle_adornments()
+
+    handle_legend();
+    handle_colorbar();
 
 end % function
 
@@ -214,11 +226,43 @@ function go_handle_legend()
     % octave
     h = get(gca,'Children');
     props = get(h(end));
-    if ~isempty(props.displayname)
+    if isfield(props,'displayname') && ~isempty(props.displayname)
         lgd = legend;
         set(lgd,'Color','black');
         set(lgd,'EdgeColor','white');
         set(lgd,'TextColor','white');
+    end
+
+end % function
+
+function handle_colorbar()
+
+    if isoctave()
+      go_handle_colorbar();
+    else
+      ml_handle_colorbar();
+    end
+
+end % function
+
+function ml_handle_colorbar()
+
+    cb = get(gca,'Colorbar');
+    if ~isempty(cb)
+        set(cb,'Color','white');
+    end
+
+end % function
+
+function go_handle_colorbar()
+
+    props = get(gca);
+    if isfield(props,'__colorbar_handle__')
+        cb = get(gca,'__colorbar_handle__');
+        if ~isempty(cb)
+            set(cb,'ycolor','white');
+            set(cb,'fontsize',12);
+        end
     end
 
 end % function
