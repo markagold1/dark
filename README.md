@@ -16,6 +16,8 @@ UNDARK is included to restore a dark-themed plot back to its standard light them
 
 ![Sample plot 2](./images/example2.PNG "Sample plot 2")
 
+![Sample plot 3](./images/example3.PNG "Sample plot 3")
+
 # Examples
 ### 1. Make a simple dark themed line plot
 
