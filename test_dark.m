@@ -8,6 +8,7 @@ legend('this','that')
 xlabel('blivit')
 ylabel('barvid')
 title('This and That')
+text(4.5,8,'hello world!')
 drawnow
 pause(1)
 dark
@@ -20,6 +21,7 @@ legend('this','that')
 xlabel('blivit')
 ylabel('barvid')
 title('This and That')
+text(4.5,8,'hello world!')
 drawnow
 pause(1)
 dark
@@ -32,6 +34,7 @@ legend('this','that')
 xlabel('blivit')
 ylabel('barvid')
 title('This and That')
+text(8,6,'hello world!')
 drawnow
 pause(1)
 dark
@@ -44,6 +47,7 @@ legend('this','that')
 xlabel('blivit')
 ylabel('barvid')
 title('This and That')
+text(5,8,'hello world!')
 drawnow
 pause(1)
 dark('bp')
@@ -66,6 +70,7 @@ legend('this','that')
 xlabel('blivit')
 ylabel('barvid')
 title('This and That')
+text(35,10,'hello world!')
 grid on;
 drawnow
 pause(1)
@@ -82,6 +87,7 @@ xlabel('X')
 ylabel('Y')
 zlabel('Z')
 title('3-d plot')
+text(-0.75,-0.75,1,'hello world!')
 pause(1)
 dark
 pause(2)
@@ -97,6 +103,7 @@ xlabel('X')
 ylabel('Y')
 zlabel('Z')
 title('3-d plot on top of imagesc')
+text(10,20,2,'hello world!')
 colorbar;
 pause(1)
 dark

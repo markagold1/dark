@@ -100,18 +100,20 @@ function ml_graph_data()
     for kk = numel(h):-1:1
         cc = cc + 1;
         index = rem(cc-1,size(colors,1)) + 1;
-        if isa(h, 'matlab.graphics.chart.primitive.Line')
+        if isa(h(kk), 'matlab.graphics.chart.primitive.Line')
             set(h(kk),'Color',colors(index,:));
             set(h(kk),'MarkerFaceColor',colors(index,:));
             set(h(kk),'MarkerEdgeColor',colors(index,:));
-        elseif isa(h, 'matlab.graphics.chart.primitive.Bar')
+        elseif isa(h(kk), 'matlab.graphics.chart.primitive.Bar')
             set(h(kk),'FaceColor',colors(index,:));
             set(h(kk),'EdgeColor','white');
             set(h(kk),'EdgeAlpha',0.5);
-        elseif isa(h, 'matlab.graphics.chart.primitive.Stem')
+        elseif isa(h(kk), 'matlab.graphics.chart.primitive.Stem')
             set(h(kk),'Color',colors(index,:));
             set(h(kk),'MarkerFaceColor',colors(index,:));
             set(h(kk),'MarkerEdgeColor',colors(index,:));
+        elseif isa(h(kk), 'matlab.graphics.primitive.Text')
+            set(h(kk),'Color',[1 1 1]);
         end
     end
 
@@ -129,10 +131,10 @@ function go_graph_data()
         index = rem(cc-1,size(colors,1)) + 1;
         if isa(h, 'double')
             % octave
-            props = get(h(end));
-            if strcmpi(get(h(end),'type'),'line')
+            props = get(h(kk));
+            if strcmpi(get(h(kk),'type'),'line')
                 set(h(kk),'Color',colors(index,:));
-            elseif strcmpi(get(h(end),'type'),'hggroup')
+            elseif strcmpi(get(h(kk),'type'),'hggroup')
                 if isfield(props,'bargroup')
                     % bar plot
                     set(h(kk),'FaceColor',colors(index,:));
@@ -145,7 +147,9 @@ function go_graph_data()
                         set(h(kk),'MarkerFaceColor',colors(index,:));
                     end
                 end
-            end % hggroup
+            elseif strcmpi(get(h(kk),'type'),'text')
+                set(h(kk),'color',[1 1 1]);
+            end % strcmpi
         end % double
     end % kk
 
