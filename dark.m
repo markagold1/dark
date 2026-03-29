@@ -50,7 +50,7 @@ function dark(colors_in)
 %  >> dark('bp');
 %
 
-    global colors
+    global colors %#ok<*GVMIS>
 
     if nargin == 0
         colors = fetch_colortab();
@@ -70,12 +70,12 @@ end % main function
 function draw_canvas()
 
     % draw background
-    set(gca,'Color','black');
-    set(gcf,'Color','black');
-    set(gca,'zcolor','white');
+    set(gca,'Color','black')
+    set(gcf,'Color','black')
+    set(gca,'zcolor','white')
     if isoctave()
-        set(gca,'xcolor','white');
-        set(gca,'ycolor','white');
+        set(gca,'xcolor','white')
+        set(gca,'ycolor','white')
     end
 
 end % function
@@ -100,25 +100,26 @@ function ml_graph_data()
     for kk = numel(h):-1:1
         cc = cc + 1;
         index = rem(cc-1,size(colors,1)) + 1;
-        if isa(h(kk), 'matlab.graphics.chart.primitive.Line')
-            set(h(kk),'Color',colors(index,:));
-            set(h(kk),'MarkerFaceColor',colors(index,:));
-            set(h(kk),'MarkerEdgeColor',colors(index,:));
-        elseif isa(h(kk), 'matlab.graphics.chart.primitive.Bar')
-            set(h(kk),'FaceColor',colors(index,:));
-            set(h(kk),'EdgeColor','white');
-            set(h(kk),'EdgeAlpha',0.5);
-        elseif isa(h(kk), 'matlab.graphics.chart.primitive.Stem')
-            set(h(kk),'Color',colors(index,:));
-            set(h(kk),'MarkerFaceColor',colors(index,:));
-            set(h(kk),'MarkerEdgeColor',colors(index,:));
-        elseif isa(h(kk), 'matlab.graphics.primitive.Patch')
+        switch class(h(kk))
+          case 'matlab.graphics.chart.primitive.Line'
+            set(h(kk),'Color',colors(index,:))
+            set(h(kk),'MarkerFaceColor',colors(index,:))
+            set(h(kk),'MarkerEdgeColor',colors(index,:))
+          case 'matlab.graphics.chart.primitive.Bar'
+            set(h(kk),'FaceColor',colors(index,:))
+            set(h(kk),'EdgeColor','white')
+            set(h(kk),'EdgeAlpha',0.5)
+          case 'matlab.graphics.chart.primitive.Stem'
+            set(h(kk),'Color',colors(index,:))
+            set(h(kk),'MarkerFaceColor',colors(index,:))
+            set(h(kk),'MarkerEdgeColor',colors(index,:))
+          case 'matlab.graphics.primitive.Patch'
             celight = get(h(kk),'EdgeColor');
             cflight = get(h(kk),'FaceColor');
-            set(h(kk),'EdgeColor',[1 1 1] - celight);
-            set(h(kk),'FaceColor',[1 1 1] - cflight);
-        elseif isa(h(kk), 'matlab.graphics.primitive.Text')
-            set(h(kk),'Color','w');
+            set(h(kk),'EdgeColor',[1 1 1] - celight)
+            set(h(kk),'FaceColor',[1 1 1] - cflight)
+          case 'matlab.graphics.primitive.Text'
+            set(h(kk),'Color','w')
         end
     end
 
@@ -136,28 +137,29 @@ function go_graph_data()
         index = rem(cc-1,size(colors,1)) + 1;
         if isa(h, 'double')
             % octave
-            if strcmpi(get(h(kk),'type'),'line')
-                set(h(kk),'Color',colors(index,:));
-            elseif strcmpi(get(h(kk),'type'),'hggroup')
+            switch lower(get(h(kk),'type'))
+              case 'line'
+                set(h(kk),'Color',colors(index,:))
+              case 'hggroup'
                 if isfield(get(h(kk)),'bargroup')
                     % bar plot
-                    set(h(kk),'FaceColor',colors(index,:));
-                    set(h(kk),'EdgeColor','white');
+                    set(h(kk),'FaceColor',colors(index,:))
+                    set(h(kk),'EdgeColor','white')
                 else
                     % stem plot
-                    set(h(kk),'Color',colors(index,:));
-                    set(h(kk),'MarkerEdgeColor',colors(index,:));
+                    set(h(kk),'Color',colors(index,:))
+                    set(h(kk),'MarkerEdgeColor',colors(index,:))
                     if isnumeric(get(h(kk)).markerfacecolor)
-                        set(h(kk),'MarkerFaceColor',colors(index,:));
+                        set(h(kk),'MarkerFaceColor',colors(index,:))
                     end
                 end
-            elseif strcmpi(get(h(kk),'type'),'patch')
+              case 'patch'
                 celight = get(h(kk),'EdgeColor');
                 cflight = get(h(kk),'FaceColor');
-                set(h(kk),'EdgeColor',[1 1 1] - celight);
-                set(h(kk),'FaceColor',[1 1 1] - cflight);
-            elseif strcmpi(get(h(kk),'type'),'text')
-                set(h(kk),'Color','w');
+                set(h(kk),'EdgeColor',[1 1 1] - celight)
+                set(h(kk),'FaceColor',[1 1 1] - cflight)
+              case 'text'
+                set(h(kk),'Color','w')
             end % hggroup
         end % double
     end % kk
@@ -179,9 +181,9 @@ function ml_label_axes()
     tt = get(gca,'title');
     xx = get(gca,'xaxis');
     yy = get(gca,'yaxis');
-    set(tt,'Color','white');
-    set(xx,'Color','white');
-    set(yy,'Color','white');
+    set(tt,'Color','white')
+    set(xx,'Color','white')
+    set(yy,'Color','white')
 
 end % function
 
@@ -192,10 +194,10 @@ function go_label_axes()
     xx = get(gca,'xlabel');
     yy = get(gca,'ylabel');
     zz = get(gca,'zlabel');
-    set(tt,'Color','white');
-    set(xx,'Color','white');
-    set(yy,'Color','white');
-    set(zz,'Color','white');
+    set(tt,'Color','white')
+    set(xx,'Color','white')
+    set(yy,'Color','white')
+    set(zz,'Color','white')
 
 end % function
 
@@ -241,9 +243,9 @@ function go_handle_legend()
     props = get(h(end));
     if isfield(props,'displayname') && ~isempty(props.displayname)
         lgd = legend;
-        set(lgd,'Color','black');
-        set(lgd,'EdgeColor','white');
-        set(lgd,'TextColor','white');
+        set(lgd,'Color','black')
+        set(lgd,'EdgeColor','white')
+        set(lgd,'TextColor','white')
     end
 
 end % function
@@ -262,7 +264,7 @@ function ml_handle_colorbar()
 
     cb = get(gca,'Colorbar');
     if ~isempty(cb)
-        set(cb,'Color','white');
+        set(cb,'Color','white')
     end
 
 end % function
@@ -273,8 +275,8 @@ function go_handle_colorbar()
     if isfield(props,'__colorbar_handle__')
         cb = get(gca,'__colorbar_handle__');
         if ~isempty(cb)
-            set(cb,'ycolor','white');
-            set(cb,'fontsize',12);
+            set(cb,'ycolor','white')
+            set(cb,'fontsize',12)
         end
     end
 
@@ -292,8 +294,8 @@ end % function
 
 function ml_finish_up()
 
-    set(gca,'GridColor','white');
-    set(gca,'GridAlpha',0.3);
+    set(gca,'GridColor','white')
+    set(gca,'GridAlpha',0.3)
 
 end % function
 
@@ -301,13 +303,13 @@ function go_finish_up()
 
     props = get(gca);
     if isfield(props,'gridcolor')
-        set(gca,'GridColor','white');
+        set(gca,'GridColor','white')
     end
     if isfield(props,'gridalpha')
-        set(gca,'GridAlpha',0.3);
+        set(gca,'GridAlpha',0.3)
     end
     if isfield(props,'fontsize')
-        set(gca,'FontSize',14);
+        set(gca,'FontSize',14)
     end
 
 end % function
@@ -318,7 +320,7 @@ function colortab = fetch_colortab(colors_in)
         fc = fieldnames(colortab_base());
         c = '';
         for kk = 1:numel(fc)
-            c = [c fc{kk}];
+            c = [c fc{kk}]; %#ok<*AGROW>
         end
     else
         c = colors_in;

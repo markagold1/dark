@@ -1,4 +1,4 @@
-function hand(colors_in)
+function hand(colors_in, fallback)
 % Usage: hand(colors_in)
 %
 %  Hand-drawn-theme plots.
@@ -42,22 +42,26 @@ function hand(colors_in)
 %  >> hand;
 %
 
-    global COLORS
+    global COLORS %#ok<*GVMIS>
     global CANVAS_RGB
     global FONT_NAME
     global FONT_SIZE
     global FONT_ANGLE
 
-    if nargin == 0
+    if nargin < 1
         COLORS = fetch_colortab();
     else
         COLORS = fetch_colortab(lower(colors_in));
     end
 
+    if nargin < 2
+        fallback = true;
+    end
+
     % Emulate engineering graph paper background
     CANVAS_RGB = [220 243 182]/256;
 
-    [font_name, font_size, font_angle] = setup_font();
+    [font_name, font_size, font_angle] = check_font(fallback);
     FONT_NAME = font_name;
     FONT_SIZE = font_size;
     FONT_ANGLE = font_angle;
@@ -70,93 +74,40 @@ function hand(colors_in)
 
 end % main function
 
-function [font_name, font_size, font_angle] = setup_font()
-    font_angle = 'normal';
-    font_size = 20;
-    if ispc()
-        %font_name = 'Comic Sans MS';
-        font_name = 'Segoe Print';
-    elseif isunix()
-        font_name = 'xkcd Script';
-        isfont = ~system("fc-list -q 'xkcd Script'");
-        if ~isfont
-            try
-                isfont = install_font();
-            catch err
-                warning(err.identifier, err.message);
-                isfont = false;
-            end
-            if isfont
-                if ~isoctave()
-                    estr = sprintf('\n\n');
-                    estr = sprintf('%s    %s\n', estr,repmat('*',1,56));
-                    estr = sprintf('%s    Restart MATLAB to refresh font list.\n', estr);
-                    estr = sprintf('%s    %s\n\n', estr,repmat('*',1,56));
-                    warning(estr);
-                else 
-                    if strcmp(graphics_toolkit(),'gnuplot')
-                        estr = sprintf('\n\n');
-                        estr = sprintf('%s    %s\n', estr,repmat('*',1,56));
-                        estr = sprintf('%s    GNU Octave is configured to use gnuplot graphics which\n', estr);
-                        estr = sprintf('%s    is not compatible with HAND. Use the GNU Octave command\n', estr);
-                        estr = sprintf('%s    available_graphics_toolkits() and change to a different\n', estr);
-                        estr = sprintf('%s    toolkit with graphics_toolkit(new_toolkit_name).\n', estr);
-                        estr = sprintf('%s    See help graphics_toolkit for more information.\n', estr);
-                        estr = sprintf('%s    %s\n\n', estr,repmat('*',1,56));
-                        warning(estr);
-                    end 
-                end 
-            else
-                % font did not install, fallback to a standard font
-                font_name = 'Times';  % <something standard>
-                font_angle = 'italic';
-            end % isfont
-        end % ~isfont
-    else
-        warning('Only Windows and Linux are currently supported.');
-        font_name = 'Pacifico';
-    end % ispc()
+function [font_name, font_size, font_angle] = check_font(fallback)
+  font_angle = 'normal';
+  font_size = 20;
+  font_name = 'xkcd Script';
+  fonts_avail = listfonts();
+  isfont = any(ismember(fonts_avail, 'xkcd Script'));
+  if ~isfont
+    if ~fallback
+      error(isfont, "run install_font() function to setup 'xkcd Script' font")
+    end
 
-end % function
+    fonts = {'Segoe Print', 'Pacifico', 'Times', 'default'};
+    for i = 1:length(fonts)
+      if any(ismember(fonts_avail, fonts{i}))
+        font_name = fonts{i};
+        break
+      end
+    end
 
-function ok = install_font()
-    % Linux only
-    if ~isunix()
-        ok = false;
-        return
-    end
-    if ~exist('~/.local')
-        mkdir('~','.local')
-    end
-    if ~exist('~/.local/share')
-        mkdir('~/.local','share')
-    end
-    if ~exist('~/.local/share/fonts')
-        mkdir('~/.local/share','fonts')
-    end
-    if ~exist('~/.local/share/fonts/xkcd-script.ttf')
-        P = mfilename('fullpath');
-        fp = fileparts([P '.m']);
-        ff = fullfile(fp,'xkcd-script.ttf'); 
-        cmd1 = sprintf('cp %s ~/.local/share/fonts/',ff); 
-        ok = ~system(cmd1);
-        if ok
-            system('fc-cache -f -y -v ~/.local/share/fonts/ 2> /dev/null');
-            ok = ~system("fc-list -q 'xkcd Script'");
-        end
-    end
+    warning('font "xkcd Script" not registered; trying font %s.\nUse function install_font() to install xkcd Script', font_name)
+  end
+
 end % function
 
 function draw_canvas()
     global CANVAS_RGB
 
     % emulate engineering graph paper background
-    set(gca,'Color',CANVAS_RGB);
-    set(gcf,'Color',CANVAS_RGB);
-    set(gca,'zcolor','black');
+    set(gca,'Color',CANVAS_RGB)
+    set(gcf,'Color',CANVAS_RGB)
+    set(gca,'zcolor','black')
     if isoctave()
-        set(gca,'xcolor','black');
-        set(gca,'ycolor','black');
+        set(gca,'xcolor','black')
+        set(gca,'ycolor','black')
     end
 
 end % function
@@ -181,19 +132,20 @@ function ml_graph_data()
     for kk = numel(h):-1:1
         cc = cc + 1;
         index = rem(cc-1,size(COLORS,1)) + 1;
-        if isa(h(kk), 'matlab.graphics.chart.primitive.Line')
-            set(h(kk),'Color',COLORS(index,:));
-            set(h(kk),'MarkerFaceColor',COLORS(index,:));
-            set(h(kk),'MarkerEdgeColor',COLORS(index,:));
-            set(h(kk),'LineWidth',3);
-        elseif isa(h(kk), 'matlab.graphics.chart.primitive.Bar')
-            set(h(kk),'FaceColor',COLORS(index,:));
-            set(h(kk),'EdgeColor','black');
-            set(h(kk),'EdgeAlpha',0.5);
-        elseif isa(h(kk), 'matlab.graphics.chart.primitive.Stem')
-            set(h(kk),'Color',COLORS(index,:));
-            set(h(kk),'MarkerFaceColor',COLORS(index,:));
-            set(h(kk),'MarkerEdgeColor',COLORS(index,:));
+        switch class(h(kk))
+          case 'matlab.graphics.chart.primitive.Line'
+            set(h(kk),'Color',COLORS(index,:))
+            set(h(kk),'MarkerFaceColor',COLORS(index,:))
+            set(h(kk),'MarkerEdgeColor',COLORS(index,:))
+            set(h(kk),'LineWidth',3)
+          case 'matlab.graphics.chart.primitive.Bar'
+            set(h(kk),'FaceColor',COLORS(index,:))
+            set(h(kk),'EdgeColor','black')
+            set(h(kk),'EdgeAlpha',0.5)
+          case 'matlab.graphics.chart.primitive.Stem'
+            set(h(kk),'Color',COLORS(index,:))
+            set(h(kk),'MarkerFaceColor',COLORS(index,:))
+            set(h(kk),'MarkerEdgeColor',COLORS(index,:))
         end
     end
 
@@ -211,20 +163,21 @@ function go_graph_data()
         index = rem(cc-1,size(COLORS,1)) + 1;
         if isa(h, 'double')
             % octave
-            if strcmpi(get(h(kk),'type'),'line')
-                set(h(kk),'Color',COLORS(index,:));
-                set(h(kk),'LineWidth',3);
-            elseif strcmpi(get(h(kk),'type'),'hggroup')
+            switch lower(get(h(kk),'type'))
+              case 'line'
+                set(h(kk),'Color',COLORS(index,:))
+                set(h(kk),'LineWidth',3)
+              case 'hggroup'
                 if isfield(get(h(kk)),'bargroup')
                     % bar plot
-                    set(h(kk),'FaceColor',COLORS(index,:));
-                    set(h(kk),'EdgeColor','black');
+                    set(h(kk),'FaceColor',COLORS(index,:))
+                    set(h(kk),'EdgeColor','black')
                 else
                     % stem plot
-                    set(h(kk),'Color',COLORS(index,:));
-                    set(h(kk),'MarkerEdgeColor',COLORS(index,:));
+                    set(h(kk),'Color',COLORS(index,:))
+                    set(h(kk),'MarkerEdgeColor',COLORS(index,:))
                     if isnumeric(get(h(kk)).markerfacecolor)
-                        set(h(kk),'MarkerFaceColor',COLORS(index,:));
+                        set(h(kk),'MarkerFaceColor',COLORS(index,:))
                     end
                 end
             end % hggroup
@@ -252,13 +205,13 @@ function ml_label_axes()
     tt = get(gca,'title');
     xx = get(gca,'xaxis');
     yy = get(gca,'yaxis');
-    set(tt,'Color','black');
-    set(xx,'Color','black');
-    set(yy,'Color','black');
+    set(tt,'Color','black')
+    set(xx,'Color','black')
+    set(yy,'Color','black')
     if ~strcmpi(FONT_NAME,'default')
-        set(gca,'FontName',FONT_NAME,'FontSize',FONT_SIZE,'FontAngle',FONT_ANGLE);
+        set(gca,'FontName',FONT_NAME,'FontSize',FONT_SIZE,'FontAngle',FONT_ANGLE)
     else
-        set(gca,'FontAngle',FONT_ANGLE);
+        set(gca,'FontAngle',FONT_ANGLE)
     end
 
 end % function
@@ -274,14 +227,14 @@ function go_label_axes()
     xx = get(gca,'xlabel');
     yy = get(gca,'ylabel');
     zz = get(gca,'zlabel');
-    set(tt,'Color','black');
-    set(xx,'Color','black');
-    set(yy,'Color','black');
-    set(zz,'Color','black');
+    set(tt,'Color','black')
+    set(xx,'Color','black')
+    set(yy,'Color','black')
+    set(zz,'Color','black')
     if ~strcmpi(FONT_NAME,'default')
-        set(gca,'fontname',FONT_NAME,'fontSize',FONT_SIZE,'fontangle',FONT_ANGLE);
+        set(gca,'fontname',FONT_NAME,'fontSize',FONT_SIZE,'fontangle',FONT_ANGLE)
     else
-        set(gca,'fontangle',FONT_ANGLE);
+        set(gca,'fontangle',FONT_ANGLE)
     end
 
 
@@ -331,9 +284,9 @@ function go_handle_legend()
     props = get(h(end));
     if isfield(props,'displayname') && ~isempty(props.displayname)
         lgd = legend;
-        set(lgd,'Color',CANVAS_RGB);
-        set(lgd,'EdgeColor','black');
-        set(lgd,'TextColor','black');
+        set(lgd,'Color',CANVAS_RGB)
+        set(lgd,'EdgeColor','black')
+        set(lgd,'TextColor','black')
     end
 
 end % function
@@ -352,7 +305,7 @@ function ml_handle_colorbar()
 
     cb = get(gca,'Colorbar');
     if ~isempty(cb)
-        set(cb,'Color','black');
+        set(cb,'Color','black')
     end
 
 end % function
@@ -363,8 +316,8 @@ function go_handle_colorbar()
     if isfield(props,'__colorbar_handle__')
         cb = get(gca,'__colorbar_handle__');
         if ~isempty(cb)
-            set(cb,'ycolor','black');
-            set(cb,'fontsize',12);
+            set(cb,'ycolor','black')
+            set(cb,'fontsize',12)
         end
     end
 
@@ -384,8 +337,8 @@ end % function
 function ml_finish_up()
 
     cb = colortab_base();
-    set(gca,'GridColor',cb.g);
-    set(gca,'GridAlpha',0.5);
+    set(gca,'GridColor',cb.g)
+    set(gca,'GridAlpha',0.5)
 
 end % function
 
@@ -394,13 +347,13 @@ function go_finish_up()
     props = get(gca);
     if isfield(props,'gridcolor')
         cb = colortab_base();
-        set(gca,'GridColor',cb.g);
+        set(gca,'GridColor',cb.g)
     end
     if isfield(props,'gridalpha')
-        set(gca,'GridAlpha',0.5);
+        set(gca,'GridAlpha',0.5)
     end
     if isfield(props,'fontsize')
-        set(gca,'FontSize',20);
+        set(gca,'FontSize',20)
     end
 
 end % function
@@ -421,7 +374,7 @@ function colortab = fetch_colortab(colors_in)
     colorbase = colortab_base();
     for kk = 1:numel(c)
         if isfield(colorbase,c(kk))
-            colortab = [colortab; colorbase.(c(kk))];
+            colortab = [colortab; colorbase.(c(kk))]; %#ok<*AGROW>
         elseif c(kk) == 'k'
             colortab = [colortab; [0 0 0]]; % reluctantly support black
         else
