@@ -1,5 +1,5 @@
-function undark()
-% Usage: undark()
+function undark(figno)
+% Usage: undark(figno)
 %
 %  Convert dark-theme plots to light theme.
 %
@@ -35,11 +35,21 @@ function undark()
 
     colors = fetch_colortab();
 
-    draw_canvas();
-    graph_data();
-    label_axes();
-    handle_adornments();
-    finish_up();
+    if nargin == 1
+        all_axes = findobj(figure(figno), 'Type', 'axes');
+    else
+        fig_num = get(ancestor(gca, 'figure'), 'Number');
+        all_axes = findobj(figure(fig_num), 'Type', 'axes');
+    end
+
+    for kk = 1:numel(all_axes)
+        axes(all_axes(kk));
+        draw_canvas();
+        graph_data();
+        label_axes();
+        handle_adornments();
+        finish_up();
+    end
 
 end % main function
 
@@ -165,6 +175,7 @@ function ml_label_axes()
     set(tt,'Color','black');
     set(xx,'Color','black');
     set(yy,'Color','black');
+    set(gca,'FontName','default','FontSize','default','FontWeight','normal','FontAngle','normal');
 
 end % function
 
@@ -177,6 +188,10 @@ function go_label_axes()
     set(tt,'Color','black');
     set(xx,'Color','black');
     set(yy,'Color','black');
+    set(gca,'FontName','*');
+    set(gca,'FontSize',10);
+    set(gca,'FontWeight','normal');
+    set(gca,'FontAngle','normal');
 
 end % function
 
@@ -289,7 +304,7 @@ function go_finish_up()
         set(gca,'GridAlpha',0.2);
     end
     if isfield(props,'fontsize')
-        set(gca,'FontSize',14);
+        set(gca,'FontSize',10);
     end
 
 end % function

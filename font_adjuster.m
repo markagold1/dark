@@ -98,7 +98,7 @@ function [ti,la,tc,le,na] = ml_do_adjust(ax,titl,labls,tcks,legnd,name)
         if legnd > 0, ax.Legend.FontSize = legnd; end
         le = ax.Legend.FontSize;
     end
-    if titl || labls || tcks, ax.FontWeight = 'bold'; end
+    %if titl || labls || tcks, ax.FontWeight = 'bold'; end
 
     ti = ax.Title.FontSize;
     la = ax.XLabel.FontSize;

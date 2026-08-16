@@ -1,5 +1,7 @@
 # Easily create plots with dark and hand-drawn themes in MATLAB and GNU Octave
 
+NEW!!! Try our new QPlot GUI app ```qplot.m``` that makes it super-easy to prettify MATLAB and GNU Octave plots.
+
 ```DARK``` converts a standard light-themed plot to a dark color scheme. ```DARK``` is easy to use, simply run the command "dark" on your current plot to render it in a dark theme. Once converted you may continue to manipulate the plot as desired including zooming, panning, and modifying properties.
 
 ```DARK``` uses only native functions common to MATLAB and GNU Octave without any dependencies on toolboxes or packages. Because of this it will likely run on most any version. It's been tested with MATLAB versions R2019b, R2020b, R2022b, and R2023b as well as GNU Octave versions 3.8.2, 4.4.0, 5.2.0, 6.4.0, 8.3.0, and 9.1.0. ```DARK``` has been tested on Windows 10 and Linux distros running Centos7, RHEL 8, and Ubuntu 22.04.

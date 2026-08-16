@@ -1,5 +1,5 @@
-function hand(colors_in)
-% Usage: hand(colors_in)
+function hand(colors_in,figno)
+% Usage: hand(colors_in,figno)
 %
 %  Hand-drawn-theme plots.
 %
@@ -48,7 +48,7 @@ function hand(colors_in)
     global FONT_SIZE
     global FONT_ANGLE
 
-    if nargin == 0
+    if nargin == 0 || isempty(colors_in)
         COLORS = fetch_colortab();
     else
         COLORS = fetch_colortab(lower(colors_in));
@@ -62,11 +62,21 @@ function hand(colors_in)
     FONT_SIZE = font_size;
     FONT_ANGLE = font_angle;
 
-    draw_canvas();
-    graph_data();
-    label_axes()
-    handle_adornments();
-    finish_up();
+    if nargin == 2
+        all_axes = findobj(figure(figno), 'Type', 'axes');
+    else
+        fig_num = get(ancestor(gca, 'figure'), 'Number');
+        all_axes = findobj(figure(fig_num), 'Type', 'axes');
+    end
+
+    for kk = 1:numel(all_axes)
+        axes(all_axes(kk));
+        draw_canvas();
+        graph_data();
+        label_axes()
+        handle_adornments();
+        finish_up();
+    end
 
 end % main function
 
@@ -75,7 +85,11 @@ function [font_name, font_size, font_angle] = setup_font()
     font_size = 20;
     if ispc()
         %font_name = 'Comic Sans MS';
-        font_name = 'Segoe Print';
+        if any(strcmpi('xkcd Script', listfonts))
+            font_name = 'xkcd Script';
+        else
+            font_name = 'Segoe Print';
+        end
     elseif isunix()
         font_name = 'xkcd Script';
         isfont = ~system("fc-list -q 'xkcd Script'");
@@ -399,9 +413,9 @@ function go_finish_up()
     if isfield(props,'gridalpha')
         set(gca,'GridAlpha',0.5);
     end
-    if isfield(props,'fontsize')
-        set(gca,'FontSize',20);
-    end
+    %if isfield(props,'fontsize')
+    %    set(gca,'FontSize',20);
+    %end
 
 end % function
 

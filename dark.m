@@ -51,8 +51,15 @@ function dark(colors_in)
 %
 
     global colors
+    global fill_type
 
     if nargin == 0
+        colors = fetch_colortab();
+    elseif strcmpi(colors_in,'unfilled')
+        fill_type = 0;
+        colors = fetch_colortab();
+    elseif strcmpi(colors_in,'filled')
+        fill_type = 1;
         colors = fetch_colortab();
     else
         colors = fetch_colortab(lower(colors_in));
@@ -93,6 +100,15 @@ end % function
 function ml_graph_data()
 
     global colors
+    global fill_type
+    persistent ml_fill_type
+
+    if isempty(fill_type)
+        fill_type = 0;
+    end
+    if isempty(ml_fill_type) || ml_fill_type ~= fill_type
+        ml_fill_type = fill_type;
+   end
 
     % graph data
     h = get(gca,'Children');
@@ -102,7 +118,11 @@ function ml_graph_data()
         index = rem(cc-1,size(colors,1)) + 1;
         if isa(h(kk), 'matlab.graphics.chart.primitive.Line')
             set(h(kk),'Color',colors(index,:));
-            set(h(kk),'MarkerFaceColor',colors(index,:));
+            if ml_fill_type == 1
+                set(h(kk),'MarkerFaceColor',colors(index,:));
+            else
+                set(h(kk),'MarkerFaceColor','none');
+            end
             set(h(kk),'MarkerEdgeColor',colors(index,:));
         elseif isa(h(kk), 'matlab.graphics.chart.primitive.Bar')
             set(h(kk),'FaceColor',colors(index,:));
@@ -110,7 +130,11 @@ function ml_graph_data()
             set(h(kk),'EdgeAlpha',0.5);
         elseif isa(h(kk), 'matlab.graphics.chart.primitive.Stem')
             set(h(kk),'Color',colors(index,:));
-            set(h(kk),'MarkerFaceColor',colors(index,:));
+            if ml_fill_type == 1
+                set(h(kk),'MarkerFaceColor',colors(index,:));
+            else
+                set(h(kk),'MarkerFaceColor','none');
+            end
             set(h(kk),'MarkerEdgeColor',colors(index,:));
         elseif isa(h(kk), 'matlab.graphics.primitive.Patch')
             celight = get(h(kk),'EdgeColor');
@@ -127,6 +151,15 @@ end % function
 function go_graph_data()
 
     global colors
+    global fill_type
+    persistent go_fill_type
+
+    if isempty(fill_type)
+        fill_type = 0;
+    end
+    if isempty(go_fill_type) || go_fill_type ~= fill_type
+        go_fill_type = fill_type;
+   end
 
     % graph data
     h = get(gca,'Children');
@@ -138,6 +171,12 @@ function go_graph_data()
             % octave
             if strcmpi(get(h(kk),'type'),'line')
                 set(h(kk),'Color',colors(index,:));
+                if go_fill_type == 1
+                    set(h(kk),'MarkerFaceColor',colors(index,:));
+                else
+                    set(h(kk),'MarkerFaceColor','none');
+                end
+                set(h(kk),'MarkerEdgeColor',colors(index,:));
             elseif strcmpi(get(h(kk),'type'),'hggroup')
                 if isfield(get(h(kk)),'bargroup')
                     % bar plot
@@ -147,9 +186,14 @@ function go_graph_data()
                     % stem plot
                     set(h(kk),'Color',colors(index,:));
                     set(h(kk),'MarkerEdgeColor',colors(index,:));
-                    if isnumeric(get(h(kk)).markerfacecolor)
+                    if go_fill_type == 1
                         set(h(kk),'MarkerFaceColor',colors(index,:));
+                    else
+                        set(h(kk),'MarkerFaceColor','none');
                     end
+                    %if isnumeric(get(h(kk)).markerfacecolor)
+                    %    set(h(kk),'MarkerFaceColor',colors(index,:));
+                    %end
                 end
             elseif strcmpi(get(h(kk),'type'),'patch')
                 celight = get(h(kk),'EdgeColor');
