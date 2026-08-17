@@ -1,18 +1,19 @@
-<h2 data-heading="QPlot makes if super-easy to prettify MATLAB and GNU Octave plots." dir="auto">QPlot makes if super-easy to prettify MATLAB and GNU Octave plots.</h2>
+<h2 data-heading="QPlot GUI makes it super-easy to prettify MATLAB and GNU Octave plots." dir="auto">QPlot GUI makes it super-easy to prettify MATLAB and GNU Octave plots.</h2>
 <h3 data-heading="Step-by-step instructions" dir="auto">Step-by-step instructions</h3>
 <ol>
 <li dir="auto">Create plots as usual</li>
-<li dir="auto">Enter <code>qplot </code> to launch the prettifier app</li>
-<li dir="auto">Use <code>Figure</code> dropdown to select the figure number to to prettify</li>
+<li dir="auto">Enter <code>qplot</code> to launch the prettifier GUI</li>
+<li dir="auto">Use the <code>Figure</code> dropdown to select the figure number you want to prettify</li>
 <li dir="auto">Select your desired font from the <code>Font</code> dropdown</li>
 <li dir="auto">Use the <code>Title</code>, <code>XY</code>,  <code>Ticks</code>,  and <code>Legend</code> dropdowns to size plot fonts</li>
-<li dir="auto">Use the <code>Bold</code> and <code>Italic</code>  checkboxes to set your desired font style (if the font supports it)</li>
+<li dir="auto">Use the <code>Bold</code> and <code>Italic</code>  checkboxes to set your desired font style </li>
 <li dir="auto">Choose <code>Dark</code> or <code>Hand</code> to apply a theme, click <code>Normal</code> to revert to a standard light theme</li>
 <li dir="auto">Click <code>Update Figure List</code> if you've opened or closed figures since launching <code>QPlot</code></li>
 <li dir="auto">Close <code>QPlot</code> by clicking the <code>X</code> in the upper right corner of the app window</li>
 </ol>
 <h3 data-heading="Tips and  Hints" dir="auto">Tips and  Hints</h3>
 <ul>
+<li dir="auto">When using GNU Octave, make sure to set the graphics toolkit to "qt". <code>graphics_toolkit()</code> returns the current setting and <code>graphics_toolkit("qt")</code> configures "qt".</li>
 <li dir="auto">When using GNU Octave, selecting figure number, font type, and size is most easily done by hovering your mouse cursor over the dropdown and using the mouse scroll wheel. Mouse clicking works but is not necessary.</li>
 <li dir="auto">With MATLAB, you must click the dropdown then scroll to find your selection.</li>
 <li dir="auto">QPlot is a GUI wrapper around <code>font_adjuster.m</code>, <code>dark.m</code>, <code>undark.m</code>, and <code>hand.m</code>.</li>
