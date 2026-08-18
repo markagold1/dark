@@ -13,9 +13,16 @@
 </ol>
 <h3 data-heading="Tips and  Hints" dir="auto">Tips and  Hints</h3>
 <ul>
-<li dir="auto">When using GNU Octave, make sure to set the graphics toolkit to "qt". <code>graphics_toolkit()</code> returns the current setting and <code>graphics_toolkit("qt")</code> configures "qt".</li>
+<li dir="auto">When using GNU Octave, make sure to set the graphics toolkit to "qt". Use <code>graphics_toolkit()</code> at the octave prompt to get the current setting and <code>graphics_toolkit("qt")</code> to configure  for "qt". We recommend adding this command to your octave startup file.</li>
+<li dir="auto">When using GNU Octave on a linux system running Wayland graphics protocol (this includes most every current distribution) we strongly recommend using <code>xcb</code>, Wayland's X11 backend. This can be accomplished by adding the following line to your .bashrc file:
+<ul>
+<li dir="auto"><code>export QT_QPA_PLATFORM=xcb</code></li>
+</ul>
+</li>
 <li dir="auto">When using GNU Octave, selecting figure number, font type, and size is most easily done by hovering your mouse cursor over the dropdown and using the mouse scroll wheel. Mouse clicking works but is not necessary.</li>
 <li dir="auto">With MATLAB, you must click the dropdown then scroll to find your selection.</li>
+<li dir="auto">On exit, QPlot remembers its last window position and size.</li>
+<li dir="auto">If QPlot launches off screen (for whatever reason) use <code>qplot('fresh')</code> to launch the app window in its default position and size.</li>
 <li dir="auto">QPlot is a GUI wrapper around <code>font_adjuster.m</code>, <code>dark.m</code>, <code>undark.m</code>, and <code>hand.m</code>.</li>
 </ul>
 <h3 data-heading="Compatibility" dir="auto">Compatibility</h3>

@@ -282,12 +282,14 @@ function go_handle_legend()
 
     % octave
     h = get(gca,'Children');
-    props = get(h(end));
-    if isfield(props,'displayname') && ~isempty(props.displayname)
-        lgd = legend;
-        set(lgd,'Color','black');
-        set(lgd,'EdgeColor','white');
-        set(lgd,'TextColor','white');
+    if ~isempty(h)
+        props = get(h(end));
+        if isfield(props,'displayname') && ~isempty(props.displayname)
+            lgd = legend;
+            set(lgd,'Color','black');
+            set(lgd,'EdgeColor','white');
+            set(lgd,'TextColor','white');
+        end
     end
 
 end % function

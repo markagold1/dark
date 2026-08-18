@@ -1,17 +1,19 @@
-function [AX,UI] = qplot()
+function [AX,UI] = qplot(fresh_start)
 
-    [AX, UI] = init_gui();
+    if nargin == 1
+        fresh_start = true;
+    else
+        fresh_start = false;
+    end
+    [AX, UI] = init_gui(fresh_start);
 
 end % main function
 
-function [AX,UI] = init_gui()
+function [AX,UI] = init_gui(fresh_start)
     global AX
     global UI
 
     % Initialize
-    scrnSz = get(groot,'ScreenSize');
-    scrn.wd = scrnSz(3);
-    scrn.ht = scrnSz(4);
     gui = 9999;
     UI.gui = gui;
     fontSize = 14;
@@ -39,22 +41,18 @@ function [AX,UI] = init_gui()
     hlp_left = 2;
     hlp_width = 6;
     hlp_ht = 6;
+    frm_left = 2;
     frm_width = 26;
     frm_btm = 10;
     frm_ht = 60;
     fig = figure(gui);
+    set(fig,'WindowStyle','normal');
     set(gui,'name','QPlot 1.0','numbertitle','off');
     set(gui,'MenuBar','none','ToolBar','none','DockControls','off');
     UI.fig = fig;
 
     % GUI position vector P: [left, bottom, width, height]
-    if scrn.ht > 1500
-        % hard-coded for 4K displays with high DPI scaling ratio
-        P = [2 2 10 30]/100;
-    else
-        % works well for 1080p and lower
-        P = [txt_left, frm_btm, frm_width, frm_ht]/100;
-    end
+    P = get_gui_size_position(fresh_start);
     set(fig, 'Units', 'normalized', 'Position', P);
     movegui(fig);
 
@@ -330,18 +328,23 @@ function [AX,UI] = init_gui()
                            'FontSize',fontSize);
     set(helpbtn, 'Callback', @(src, event) cb_dispatcher(src, 'display_help'));
 
+    %set(UI.gui, 'SizeChangedFcn', @on_resize_callback);
+    set(UI.gui, 'CloseRequestFcn', @on_exit_callback);
+
     set(UI.gui, 'Units', 'normalized', 'Position', P);
     movegui(fig);
 
     figure(crt_fignum);
     P
 
-end % main function
+end % function
 
 % dispatcher
 function cb_dispatcher(src,fcn,varargin)
     global AX
     global UI
+
+    %get(UI.gui,'Position')
 
     if strcmpi(fcn,'set_figure_number')
         strlist = cell2mat(get(src,'String'));
@@ -848,4 +851,91 @@ function allfonts = listfonts_local
         [status, output] = system(cmd);
         allfonts = strsplit(output(1:end-1), '\n');
     end
+end % function
+
+function P = get_gui_size_position(fresh_start)
+
+    qdata_settings_file = get_qdata_pathfile();
+
+    ok = 0;
+    if ~fresh_start && exist(qdata_settings_file) == 2
+        load(qdata_settings_file);
+        if exist('P') == 1
+            ok = 1;
+        end
+    end
+
+    if ~ok
+        scrnSz = get(groot,'ScreenSize');
+        scrn.ht = scrnSz(4);
+        if scrn.ht > 1500
+            % for 4K displays with high DPI scaling ratio
+            P = [2, 2, 10, 30]/100; % normalized units
+        else
+            % works well for 1080p and lower
+            P = [2, 10, 26, 60]/100; % normalized units
+        end
+    end
+    P
+
+end % function
+
+function qdata_settings = get_qdata_pathfile()
+
+    % 1. Determine the correct OS-specific root directory
+    if ispc
+        % Fetches 'C:\Users\username\AppData\Roaming'
+        config_root = getenv('APPDATA'); 
+    else
+        % Fetches '/home/username/.config' (falls back if XDG variable is empty)
+        config_root = getenv('XDG_CONFIG_HOME');
+        if isempty(config_root)
+            config_root = fullfile(getenv('HOME'), '.config');
+        end
+    end
+
+    % 2. Create a dedicated folder for your specific application/script
+    if isoctave()
+        app_dir = fullfile(config_root, 'Octave_Qplot');
+    else
+        app_dir = fullfile(config_root, 'Matlab_Qplot');
+    end
+
+    % 3. Ensure the directory actually exists on the hard drive
+    if ~exist(app_dir, 'dir')
+        mkdir(app_dir);
+    end
+
+    % 4. Define the final file path
+    qdata_settings = fullfile(app_dir, 'qplot_data.mat');
+
+end % function
+
+function on_resize_callback(src, event)
+
+    fprintf(1,'--------------------- RESIZE! -----------------\n');
+    src
+
+end % function
+
+
+function on_exit_callback(src, event)
+    global AX
+    global UI
+
+    fprintf(1,'------------ QPlot is Exiting -----------------\n');
+    screenDPI = get(groot, 'ScreenPixelsPerInch');
+    dpiRatio = screenDPI / 96
+    P = get(UI.gui, 'Position')
+    if ~isoctave
+        vNum = sscanf(version, '%d', 1); 
+        if vNum >= 25
+            % work around dynamic scaling issues
+            P = [P(1) P(2)/3.20 1.25*P(3) 1.25*P(4)];
+        end
+    end
+    qdata_settings_file = get_qdata_pathfile();
+    save(qdata_settings_file,'P');
+    delete(src); 
+
 end % function
