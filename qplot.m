@@ -5,7 +5,12 @@ function [AX,UI] = qplot(fresh_start)
     else
         fresh_start = false;
     end
-    [AX, UI] = init_gui(fresh_start);
+    if check_environment()
+        [AX, UI] = init_gui(fresh_start);
+    else
+        AX = [];
+        UI = [];
+    end
 
 end % main function
 
@@ -46,7 +51,9 @@ function [AX,UI] = init_gui(fresh_start)
     frm_btm = 10;
     frm_ht = 60;
     fig = figure(gui);
-    set(fig,'WindowStyle','normal');
+    if isoctave()
+        set(fig,'WindowStyle','normal');
+    end
     set(gui,'name','QPlot 1.0','numbertitle','off');
     set(gui,'MenuBar','none','ToolBar','none','DockControls','off');
     UI.fig = fig;
@@ -66,6 +73,7 @@ function [AX,UI] = init_gui(fresh_start)
                          'FontSize',fontSize);
     figList = uicontrol('style','popupmenu','units','normalized', ... 
                          'position',[mnu_left crt_vert mnu_width mnu_ht]/100,'String',fignums, ...
+                         'tooltipstring','Select a figure to prettify.', ...
                          'FontSize',fontSize);
     UI.figList = figList;
     list = get(UI.figList,'String');
@@ -98,6 +106,7 @@ function [AX,UI] = init_gui(fresh_start)
     fontList = uicontrol('style','popupmenu','units','normalized', ... 
                          'position',[mnu_left crt_vert mnu_width mnu_ht]/100,'String',allfonts, ...
                          'FontSize',fontSize, ...
+                         'tooltipstring','Select a font.', ...
                          'Callback', @(src, event) cb_dispatcher(src,'set_fontname'));
     crt_font = get(AX,'FontName');
     ix = find(strcmpi(allfonts,crt_font),1);
@@ -124,6 +133,7 @@ function [AX,UI] = init_gui(fresh_start)
     titlSzList = uicontrol('style','popupmenu','units','normalized', ... 
                          'position',[mnu_left crt_vert mnu_width mnu_ht]/100,'String',titlsizes_s, ...
                          'FontSize',fontSize, ...
+                         'tooltipstring','Select the title font size.', ...
                          'Callback', @(src, event) cb_dispatcher(src,'set_title_fontsize'));
     crtTitlSz = round(ti); %get(get(AX,'Title'),'FontSize');
     ix = find(titlsizes_n == round(crtTitlSz),1);
@@ -142,6 +152,7 @@ function [AX,UI] = init_gui(fresh_start)
     lablSzList = uicontrol('style','popupmenu','units','normalized', ... 
                          'position',[mnu_left crt_vert mnu_width mnu_ht]/100,'String',lablsizes_s, ...
                          'FontSize',fontSize, ...
+                         'tooltipstring','Select the axis labels font size.', ...
                          'Callback', @(src, event) cb_dispatcher(src,'set_label_fontsize'));
     crtXlablSz = round(la); %get(get(AX,'Xlabel'),'FontSize');
     crtYlablSz = round(la); %get(get(AX,'Ylabel'),'FontSize');
@@ -161,6 +172,7 @@ function [AX,UI] = init_gui(fresh_start)
     tcksSzList = uicontrol('style','popupmenu','units','normalized', ... 
                          'position',[mnu_left crt_vert mnu_width mnu_ht]/100,'String',tcksizes_s, ...
                          'FontSize',fontSize, ...
+                         'tooltipstring','Select the axis ticks font size.', ...
                          'Callback', @(src, event) cb_dispatcher(src,'set_ticks_fontsize'));
     crtXTcksSz = round(tc); %get(get(AX,'XAxis'),'FontSize');
     crtYTcksSz = round(tc); %get(get(AX,'YAxis'),'FontSize');
@@ -180,6 +192,7 @@ function [AX,UI] = init_gui(fresh_start)
     lgndSzList = uicontrol('style','popupmenu','units','normalized', ... 
                            'position',[mnu_left crt_vert mnu_width mnu_ht]/100,'String',lgndsizes_s, ...
                            'FontSize',fontSize, ...
+                           'tooltipstring','Select the legend font size.', ...
                            'Callback', @(src, event) cb_dispatcher(src,'set_legend_fontsize'));
     props = get(AX);
     if isfield(props,'Legend')
@@ -316,6 +329,7 @@ function [AX,UI] = init_gui(fresh_start)
                            'position', [btn_left crt_vert btn_width btn_ht]/100, ...
                            'String',' Update Figure List ', ...
                            'Value',1, ...
+                           'tooltipstring','Refresh the list of open figures.', ...
                            'FontSize',fontSize);
     set(refreshbtn, 'Callback', @(src, event) cb_dispatcher(src, 'refresh'));
 
@@ -325,6 +339,7 @@ function [AX,UI] = init_gui(fresh_start)
                            'position', [hlp_left crt_vert hlp_width hlp_ht]/100, ...
                            'String',' ? ', ...
                            'Value',1, ...
+                           'tooltipstring','Open QPlot help.', ...
                            'FontSize',fontSize);
     set(helpbtn, 'Callback', @(src, event) cb_dispatcher(src, 'display_help'));
 
@@ -640,7 +655,13 @@ function display_help()
     [fp,fn,fx] = fileparts(which('qplot'));
     helpfile = sprintf('file://%s',[fp '/help.html']);
     helpfile = strrep(helpfile,'\','/');
-    web(helpfile,'-browser')
+    if exist('web') == 2
+        web(helpfile,'-browser')
+    elseif ispc
+        system(sprintf('start "" "%s"', helpfile));
+    elseif isunix
+        system(sprintf('xdg-open "%s" &', helpfile));
+    end
 
 end % function
 
@@ -909,6 +930,17 @@ function qdata_settings = get_qdata_pathfile()
     % 4. Define the final file path
     qdata_settings = fullfile(app_dir, 'qplot_data.mat');
 
+end % function
+
+function ok = check_environment()
+    ok = true;
+    if isoctave()
+        if ~strcmpi(graphics_toolkit(), 'qt')
+            ok = false;
+            fprintf(2,'Unsupported graphics_tookit: %s\n', graphics_toolkit);
+            fprintf(2,'Use the command: graphics_toolkit("qt")\n');
+        end
+    end
 end % function
 
 function on_resize_callback(src, event)
