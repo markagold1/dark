@@ -1,5 +1,5 @@
-function dark(colors_in)
-% Usage: dark(colors_in)
+function dark(colors_in,figno)
+% Usage: dark(colors_in,figno)
 %
 %  Dark-theme plots.
 %
@@ -53,7 +53,7 @@ function dark(colors_in)
     global colors
     global fill_type
 
-    if nargin == 0
+    if nargin == 0 || isempty(colors_in)
         colors = fetch_colortab();
     elseif strcmpi(colors_in,'unfilled')
         fill_type = 0;
@@ -65,11 +65,21 @@ function dark(colors_in)
         colors = fetch_colortab(lower(colors_in));
     end
 
-    draw_canvas();
-    graph_data();
-    label_axes();
-    handle_adornments();
-    finish_up();
+    if nargin == 2
+        all_axes = findobj(figure(figno), 'Type', 'axes');
+    else
+        fig_num = get(ancestor(gca, 'figure'), 'Number');
+        all_axes = findobj(figure(fig_num), 'Type', 'axes');
+    end
+
+    for kk = 1:numel(all_axes)
+        axes(all_axes(kk));
+        draw_canvas();
+        graph_data();
+        label_axes();
+        handle_adornments();
+        finish_up();
+    end
 
 end % main function
 
@@ -352,9 +362,9 @@ function go_finish_up()
     if isfield(props,'gridalpha')
         set(gca,'GridAlpha',0.3);
     end
-    if isfield(props,'fontsize')
-        set(gca,'FontSize',14);
-    end
+    %if isfield(props,'fontsize')
+    %    set(gca,'FontSize',14);
+    %end
 
 end % function
 
