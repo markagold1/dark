@@ -961,7 +961,7 @@ function on_exit_callback(src, event)
     P = get(UI.gui, 'Position')
     if ~isoctave
         vNum = sscanf(version, '%d', 1); 
-        if vNum >= 25
+        if ispc && vNum >= 25
             % work around dynamic scaling issues
             P = [P(1) P(2)/3.20 1.25*P(3) 1.25*P(4)];
         end
