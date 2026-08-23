@@ -47,8 +47,15 @@ function hand(colors_in,figno)
     global FONT_NAME
     global FONT_SIZE
     global FONT_ANGLE
+    global FILL_TYPE
 
     if nargin == 0 || isempty(colors_in)
+        COLORS = fetch_colortab();
+    elseif strcmpi(colors_in,'unfilled')
+        FILL_TYPE = 0;
+        COLORS = fetch_colortab();
+    elseif strcmpi(colors_in,'filled')
+        FILL_TYPE = 1;
         COLORS = fetch_colortab();
     else
         COLORS = fetch_colortab(lower(colors_in));
@@ -188,6 +195,16 @@ end % function
 function ml_graph_data()
 
     global COLORS
+    global CANVAS_RGB
+    global FILL_TYPE
+    persistent ml_fill_type
+
+    if isempty(FILL_TYPE)
+        FILL_TYPE = 0;
+    end
+    if isempty(ml_fill_type) || ml_fill_type ~= FILL_TYPE
+        ml_fill_type = FILL_TYPE;
+   end
 
     % graph data
     h = get(gca,'Children');
@@ -197,7 +214,11 @@ function ml_graph_data()
         index = rem(cc-1,size(COLORS,1)) + 1;
         if isa(h(kk), 'matlab.graphics.chart.primitive.Line')
             set(h(kk),'Color',COLORS(index,:));
-            set(h(kk),'MarkerFaceColor',COLORS(index,:));
+            if ml_fill_type == 1
+                set(h(kk),'MarkerFaceColor',COLORS(index,:));
+            else
+                set(h(kk),'MarkerFaceColor',CANVAS_RGB);
+            end
             set(h(kk),'MarkerEdgeColor',COLORS(index,:));
             set(h(kk),'LineWidth',3);
         elseif isa(h(kk), 'matlab.graphics.chart.primitive.Bar')
@@ -206,7 +227,11 @@ function ml_graph_data()
             set(h(kk),'EdgeAlpha',0.5);
         elseif isa(h(kk), 'matlab.graphics.chart.primitive.Stem')
             set(h(kk),'Color',COLORS(index,:));
-            set(h(kk),'MarkerFaceColor',COLORS(index,:));
+            if ml_fill_type == 1
+                set(h(kk),'MarkerFaceColor',COLORS(index,:));
+            else
+                set(h(kk),'MarkerFaceColor',CANVAS_RGB);
+            end
             set(h(kk),'MarkerEdgeColor',COLORS(index,:));
         end
     end
@@ -216,6 +241,16 @@ end % function
 function go_graph_data()
 
     global COLORS
+    global CANVAS_RGB
+    global FILL_TYPE
+    persistent go_fill_type
+
+    if isempty(FILL_TYPE)
+        FILL_TYPE = 0;
+    end
+    if isempty(go_fill_type) || go_fill_type ~= FILL_TYPE
+        go_fill_type = FILL_TYPE;
+   end
 
     % graph data
     h = get(gca,'Children');
@@ -227,6 +262,12 @@ function go_graph_data()
             % octave
             if strcmpi(get(h(kk),'type'),'line')
                 set(h(kk),'Color',COLORS(index,:));
+                if go_fill_type == 1
+                    set(h(kk),'MarkerFaceColor',COLORS(index,:));
+                else
+                    set(h(kk),'MarkerFaceColor',CANVAS_RGB);
+                end
+                set(h(kk),'MarkerEdgeColor',COLORS(index,:));
                 set(h(kk),'LineWidth',3);
             elseif strcmpi(get(h(kk),'type'),'hggroup')
                 if isfield(get(h(kk)),'bargroup')
@@ -237,9 +278,14 @@ function go_graph_data()
                     % stem plot
                     set(h(kk),'Color',COLORS(index,:));
                     set(h(kk),'MarkerEdgeColor',COLORS(index,:));
-                    if isnumeric(get(h(kk)).markerfacecolor)
+                    if go_fill_type == 1
                         set(h(kk),'MarkerFaceColor',COLORS(index,:));
+                    else
+                        set(h(kk),'MarkerFaceColor',CANVAS_RGB);
                     end
+                    %if isnumeric(get(h(kk)).markerfacecolor)
+                    %    set(h(kk),'MarkerFaceColor',COLORS(index,:));
+                    %end
                 end
             end % hggroup
         end % double

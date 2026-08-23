@@ -90,9 +90,10 @@ function ml_graph_data()
         index = rem(cc-1,size(colors,1)) + 1;
         if isa(h(kk), 'matlab.graphics.chart.primitive.Line')
             set(h(kk),'Color',colors(index,:));
-            if ~strcmp(get(h(kk),'MarkerFaceColor'), 'none')
-                set(h(kk),'MarkerFaceColor',colors(index,:));
-            end
+            set(h(kk),'MarkerFaceColor','none');
+            %if ~strcmp(get(h(kk),'MarkerFaceColor'), 'none')
+            %    set(h(kk),'MarkerFaceColor',colors(index,:));
+            %end
             if ~strcmp(get(h(kk),'MarkerEdgeColor'), 'auto')
                 set(h(kk),'MarkerEdgeColor',colors(index,:));
             end
@@ -102,7 +103,8 @@ function ml_graph_data()
             set(h(kk),'EdgeAlpha',1.0);
         elseif isa(h(kk), 'matlab.graphics.chart.primitive.Stem')
             set(h(kk),'Color',colors(index,:));
-            set(h(kk),'MarkerFaceColor',colors(index,:));
+            %set(h(kk),'MarkerFaceColor',colors(index,:));
+            set(h(kk),'MarkerFaceColor','none');
             set(h(kk),'MarkerEdgeColor',colors(index,:));
         elseif isa(h(kk), 'matlab.graphics.primitive.Patch')
             celight = get(h(kk),'EdgeColor');
@@ -130,6 +132,13 @@ function go_graph_data()
             % octave
             if strcmpi(get(h(kk),'type'),'line')
                 set(h(kk),'Color',colors(index,:));
+                set(h(kk),'MarkerFaceColor','none');
+                %if ~strcmp(get(h(kk),'MarkerFaceColor'), 'none')
+                %    set(h(kk),'MarkerFaceColor',colors(index,:));
+                %end
+                if ~strcmp(get(h(kk),'MarkerEdgeColor'), 'auto')
+                    set(h(kk),'MarkerEdgeColor',colors(index,:));
+                end
             elseif strcmpi(get(h(kk),'type'),'hggroup')
                 if isfield(get(h(kk)),'bargroup')
                     % bar plot
@@ -139,10 +148,11 @@ function go_graph_data()
                 else
                     % stem plot
                     set(h(kk),'Color',colors(index,:));
+                    set(h(kk),'MarkerFaceColor','none');
+                    %if isnumeric(get(h(kk)).markerfacecolor)
+                    %    set(h(kk),'MarkerFaceColor',colors(index,:));
+                    %end
                     set(h(kk),'MarkerEdgeColor',colors(index,:));
-                    if isnumeric(get(h(kk)).markerfacecolor)
-                        set(h(kk),'MarkerFaceColor',colors(index,:));
-                    end
                 end
             elseif strcmpi(get(h(kk),'type'),'patch')
                 celight = get(h(kk),'EdgeColor');
@@ -286,6 +296,7 @@ function finish_up()
     else
       ml_finish_up();
     end
+    liner(0.6);
 
 end % function
 
@@ -335,6 +346,40 @@ function colortab = fetch_colortab()
                  [0.3010, 0.7450, 0.9330]
                  [0.6350, 0.0780, 0.1840] ];
 
+end % function
+
+function wout = liner(width,figno)
+%
+%  Read and adjust line properties.
+%
+%   width....................array of linewidths to apply
+%   figno....................optional figure number
+%   wout.....................array of line widths after  changes
+%
+    if nargin < 2
+        figno = get(ancestor(gca, 'figure'), 'Number');
+    end
+    if nargin < 1
+        width = [];
+    end
+    all_axes = findobj(figure(figno), 'Type', 'axes');
+
+    wout = [];
+    for kk = 1:numel(all_axes)
+        ax = all_axes(kk);
+        axes(ax);
+        lines = get(ax,'Children');
+        for jj = 1:numel(lines)
+            if ~isprop(lines(jj), 'LineWidth')
+                continue
+            end
+            if ~isempty(width)
+                win = width(rem(jj-1,numel(width)) + 1);
+                set(lines(jj),'LineWidth',win);
+            end
+            wout = [wout get(lines(jj),'LineWidth')];
+        end
+    end
 end % function
 
 function y = isoctave()
