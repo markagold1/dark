@@ -7,13 +7,11 @@ The ```DARK``` project evolved from a single dark-themed plot utility to a full-
 ```dark.m```, the original function, converts a plot to a dark theme.  
 ```undark.m``` reverts a plot to its standard light theme.  
 ```hand.m``` renders a plot in a hand-drawn *xkcd*-like theme.  
-```liner.m``` adjusts the width of plotted lines
+```liner.m``` adjusts the width of plotted lines.  
 ```font_adjuster.m``` provides independent control of plot fonts and sizes.  
 ```qplot.m``` is a graphical user interface (GUI) to the functions in ```DARK```
 
 The command line themes are surprisingly easy to use: After creating a plot as usual, simply run the command ```dark```, ```undark```, or ```hand``` and the current plot will be rendered accordingly.
-
-```liner``` is a simple utility to get or set the width of plotted lines.
 
 ```font_adjuster``` is only slightly more advanced: Provide font sizes for the title, x-y axes, axes ticks, legend, and a font name, along with a handle to the figure axis you wish to modify and ```font_adjuster``` will apply the specified fonts and sizes.
 
@@ -34,6 +32,7 @@ On a personal note, ```DARK``` was born out of my own need for plots with better
 * hand.m - Convert plot to a hand-drawn theme
 * test_hand.m - Test for hand.m
 * dark.m - Convert plot to a dark color theme
+* liner.m - Adjust plotted line widths 
 * undark.m - Convert dark theme plot back to the standard light theme
 * test_dark.m - Test dark.m with several plot types
 * test_undark.m - Test undark.m with several plot types
