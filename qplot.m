@@ -362,12 +362,12 @@ function cb_dispatcher(src,fcn,varargin)
     %get(UI.gui,'Position')
 
     if strcmpi(fcn,'set_figure_number')
-        strlist = cell2mat(get(src,'String'));
+        C = get(src,'String');
         ix = get(src,'Value');
-        new_fignum = str2num(strlist(ix));
+        new_fignum = str2num(C{ix});
         refresh_figure_list(new_fignum);
     else
-    refresh_figure_list();
+        refresh_figure_list();
     end
 
     if numel(varargin) == 3
@@ -445,8 +445,14 @@ function set_figure_number(src)
     global AX
     global UI
 
-    figstr = get(src,'String');
-    fignum = str2num(figstr{get(src,'Value')});
+    val = get(src,'Value');
+    C = get(src,'String');
+    C2 = cellfun(@strtrim,C,'UniformOutput',false);
+    if numel(C2) >= val
+        fignum = str2double(C2{val});
+    else
+        fignum = 1;
+    end
     figure(fignum);
     AX = gca;
     UI.figList = src;
@@ -778,21 +784,24 @@ function refresh_figure_list(fignum)
     if nargin == 1
         crt_fignum = fignum;
     else
-    crt_fignum = get_fignum_from_ax(AX);
+        crt_fignum = get_fignum_from_ax(AX);
     end
     if ~isempty(crt_fignum)
         figstr = num2str(crt_fignum);
-        strlist = cell2mat(get(UI.figList,'String'));
-        ix = find(strlist == figstr);
-        new_fignum = str2num(strlist(ix));
-        set(UI.figList,'String',fignums(:));
+        C = get(UI.figList,'String');
+        C2 = cellfun(@strtrim,C,'UniformOutput',false);
+        ix = find(strcmp(C2,figstr));
+        new_fignum = str2double(C2{ix});
+        C3 = cellfun(@strtrim,fignums(:),'UniformOutput',false);
+        set(UI.figList,'String',C3);
         set(UI.figList,'Value',ix);
         figure(new_fignum);
         AX = gca;
     elseif ~isempty(fignums) && ~isempty(fignums{1})
         figstr = fignums{1};
-        new_fignum = str2num(figstr);
-        set(UI.figList,'String',fignums(:));
+        new_fignum = str2double(figstr);
+        C = cellfun(@strtrim,fignums(:),'UniformOutput',false);
+        set(UI.figList,'String',C);
         set(UI.figList,'Value',1);
         figure(new_fignum);
         AX = gca;
