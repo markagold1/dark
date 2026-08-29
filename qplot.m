@@ -21,7 +21,7 @@ function [AX,UI] = init_gui(fresh_start)
     % Initialize
     gui = 9999;
     UI.gui = gui;
-    fontSize = 14;
+    fontSize = 12;
     bottom = 89;
     vert_delta = -6.5;
     crt_vert = bottom;
@@ -347,6 +347,8 @@ function [AX,UI] = init_gui(fresh_start)
     set(UI.gui, 'CloseRequestFcn', @on_exit_callback);
 
     set(UI.gui, 'Units', 'normalized', 'Position', P);
+    figure(fig);
+    set(gcf,'NextPlot','new');
     movegui(fig);
 
     figure(crt_fignum);
