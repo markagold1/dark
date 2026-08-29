@@ -29,6 +29,7 @@ function [AX,UI] = init_gui(fresh_start)
     txt_width = 30;
     txt_ht = 6;
     txt_rt = 50;
+    grd_left = 15;
     mnu_left = 35;
     mnu_width = 55;
     mnu_ht = 6;
@@ -40,11 +41,11 @@ function [AX,UI] = init_gui(fresh_start)
     rb_rt =  75;
     rb_width =  40;
     rb_ht =  10-2;
-    btn_left = 25;
-    btn_width = 50;
+    btn_left = 30;
+    btn_width = 42;
     btn_ht = 6; 
-    hlp_left = 2;
-    hlp_width = 6;
+    hlp_left = 88;
+    hlp_width = 7;
     hlp_ht = 6;
     frm_left = 2;
     frm_width = 26;
@@ -341,24 +342,36 @@ function [AX,UI] = init_gui(fresh_start)
 
     crt_vert = crt_vert + vert_delta;
 
+    % grid checkbox
+    gridtxt = uicontrol('style','text','units','normalized', ... 
+                        'position',[txt_left crt_vert txt_width txt_ht]/100,'String','Grid: ', ...
+                        'HorizontalAlignment','Left', ...
+                        'FontSize',fontSize-2);
+    gridbox = uicontrol('style','checkbox','units','normalized', ... 
+                        'position',[grd_left crt_vert chk_width chk_ht]/100, ...
+                        'Callback', @(src, event) cb_dispatcher(src,'set_grid_onoff'));
+    UI.gridbox = gridbox;
+    init_grid_onoff(UI.gridbox);
+    fig = figure(gui);
+
     % refresh button widget - scans for open figures - consider eliminating
     refreshbtn = uicontrol('style', 'pushbutton', ...
                            'units', 'normalized', ...
                            'position', [btn_left crt_vert btn_width btn_ht]/100, ...
-                           'String',' Update Figure List ', ...
+                           'String','Update Figure List ', ...
                            'Value',1, ...
                            'tooltipstring','Refresh the list of open figures.', ...
-                           'FontSize',fontSize);
+                           'FontSize',fontSize-2);
     set(refreshbtn, 'Callback', @(src, event) cb_dispatcher(src, 'refresh'));
 
     % help button widget
     helpbtn = uicontrol('style', 'pushbutton', ...
                            'units', 'normalized', ...
                            'position', [hlp_left crt_vert hlp_width hlp_ht]/100, ...
-                           'String',' ? ', ...
+                           'String','? ', ...
                            'Value',1, ...
                            'tooltipstring','Open QPlot help.', ...
-                           'FontSize',fontSize);
+                           'FontSize',fontSize-2);
     set(helpbtn, 'Callback', @(src, event) cb_dispatcher(src, 'display_help'));
 
     %set(UI.gui, 'SizeChangedFcn', @on_resize_callback);
@@ -454,6 +467,8 @@ function cb_dispatcher(src,fcn,varargin)
                 set_legend_bold(src);
             case 'set_legend_italic'
                 set_legend_italic(src);
+            case 'set_grid_onoff'
+                set_grid_onoff(src);
             otherwise
                 fprintf(2,'Unknown callback function %s.\n', fcn);
         end
@@ -684,6 +699,54 @@ function set_legend_italic(src)
 
 end % function
 
+function init_grid_onoff(src)
+    global AX
+    global UI
+
+    figno = get_figure_number();
+    if figno == UI.gui
+        return
+    end
+    props = get(AX);
+    if isfield(props,'XGrid') || isfield(props,'xgrid')
+        crtgrid = get(AX,'xgrid');
+        if strcmpi(crtgrid,'on')
+            set(src,'Value',1);
+        else
+            set(src,'Value',0);
+        end
+        UI.gridbox = src;
+    end
+
+end % function
+
+function set_grid_onoff(src)
+    global AX
+    global UI
+
+    figno = get_figure_number();
+    if figno == UI.gui
+        return
+    end
+    props = get(AX);
+    if isfield(props,'XGrid') || isfield(props,'xgrid')
+        crtgrid = get(AX,'xgrid');
+        if strcmpi(crtgrid,'on')
+            set(AX,'xgrid','off');
+            set(AX,'ygrid','off');
+            set(AX,'zgrid','off');
+            set(src,'Value',0);
+        else
+            set(AX,'xgrid','on');
+            set(AX,'ygrid','on');
+            set(AX,'zgrid','on');
+            set(src,'Value',1);
+        end
+        UI.gridbox = src;
+    end
+
+end % function
+
 function set_theme(src,clicked_btn,other_btn,other_other_btn)
     global AX
     global UI
@@ -832,6 +895,7 @@ function refresh()
             set(UI.lgndItal,'Value', 1);
         end
     end
+    init_grid_onoff(UI.gridbox);
     update_theme();
 
 end % function
