@@ -124,10 +124,11 @@ hand
 
 # QPlot tips and hints
 * When using GNU Octave, make sure to set the graphics toolkit to "qt". Enter `graphics_toolkit()` at the octave prompt to get the current setting and `graphics_toolkit("qt")` to configure for "qt". We recommend adding this command to your octave startup file.
-* When using GNU Octave on a linux system running Wayland graphics protocol (this includes most every current distribution) we strongly recommend using `xcb`, Wayland's X11 backend. This can be accomplished by adding the following line to your .bashrc file:
+* When using a linux system running Wayland graphics protocol (this includes most every current distribution) we strongly recommend using `xcb`, Wayland's X11 backend. This can be accomplished by adding the following line to your .bashrc file:
 	* `export QT_QPA_PLATFORM=xcb`
 * When using GNU Octave, selecting figure number, font type, and size is most easily done by hovering your mouse cursor over the dropdown and using the mouse scroll wheel. Mouse clicking works but is not necessary.
 * With MATLAB, you must click the dropdown then scroll to find your selection.
+* Line thickness is limited on some older windows systems running Intel Integrated Graphics. Thickness appears to be limited to about 3 points.
 * On exit, QPlot remembers its last window position and size.
 * If QPlot launches off screen (for whatever reason) use `qplot('fresh')` to launch the app window in its default position and size.
 
