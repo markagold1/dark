@@ -22,15 +22,15 @@ function [AX,UI] = init_gui(fresh_start)
     gui = 9999;
     UI.gui = gui;
     fontSize = 12;
-    bottom = 89;
+    bottom = 94;
     vert_delta = -6.5;
     crt_vert = bottom;
     txt_left = 2;
-    txt_width = 25;
+    txt_width = 30;
     txt_ht = 6;
     txt_rt = 50;
     mnu_left = 35;
-    mnu_width = 60;
+    mnu_width = 55;
     mnu_ht = 6;
     chk_width = 25;
     chk_ht = 6;
@@ -208,6 +208,24 @@ function [AX,UI] = init_gui(fresh_start)
         set(lgndSzList,'Value',ix);
     end
     UI.lgndSzList = lgndSzList;
+
+    crt_vert = crt_vert + vert_delta;
+
+    % Line Width
+    lwidtext = uicontrol('style','text','units','normalized', ... 
+                         'position',[txt_left crt_vert txt_width txt_ht]/100,'String','Line Width: ', ...
+                         'HorizontalAlignment','Left', ...
+                         'FontSize',fontSize);
+    lwidsizes_n = shiftdim(0.1:0.1:20);
+    lwidsizes_s = cellstr(num2str(lwidsizes_n));
+    lwidSzList = uicontrol('style','popupmenu','units','normalized', ... 
+                           'position',[mnu_left crt_vert mnu_width mnu_ht]/100,'String',lwidsizes_s, ...
+                           'FontSize',fontSize, ...
+                           'tooltipstring','Set line width.', ...
+                           'Callback', @(src, event) cb_dispatcher(src,'set_line_width'));
+    init_line_width(lwidSzList);
+    UI.lwidSzList = lwidSzList;
+    fig = figure(gui);
 
     crt_vert = crt_vert + 1.1 * vert_delta;
 
@@ -396,6 +414,8 @@ function cb_dispatcher(src,fcn,varargin)
         refresh();
     elseif strcmpi(fcn,'set_figure_number')
         set_figure_number(src);
+    elseif strcmpi(fcn,'set_line_width')
+        set_line_width(src);
     elseif strcmpi(fcn,'display_help')
         display_help();
     else
@@ -520,6 +540,43 @@ function set_legend_fontsize(src)
     if lgnd ~= le, le = lgnd; end
     [ti,la,tc,le,na] = font_adjuster(AX, ti, la, tc, le, na);
     UI.lgndSzList = src;
+
+end % function
+
+function init_line_width(src)
+    global AX
+    global UI
+
+    figno = get_figure_number();
+    wout = liner([],figno);
+    if ~isempty(wout)
+        s = get(src,'String');
+        n = str2double(s);
+        if isoctave()
+            init_ix = find(n==round(10*max(wout))/10);
+        else
+            init_ix = find(n==round(wout(1),1));
+        end
+        set(src,'Value',init_ix);
+        UI.lwidSzList = src;
+    end
+
+end % function
+
+function set_line_width(src)
+    global AX
+    global UI
+
+    figno = get_figure_number();
+    wout = liner([],figno);
+    if ~isempty(wout)
+        ix = get(src,'Value');
+        s = get(src,'String');
+        set(src,'Value',ix);
+        UI.lwidSzList = src;
+        new_wid = str2double(s{ix});
+        liner(new_wid,figno);
+    end
 
 end % function
 
@@ -733,6 +790,7 @@ function refresh()
     if le
         set(UI.lgndSzList,'Value',le);
     end
+    init_line_width(UI.lwidSzList);
     if strcmpi(get(get(AX,'Title'),'FontWeight'),'bold')
         set(UI.titlBold,'Value', 1);
     else
