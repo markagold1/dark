@@ -55,7 +55,7 @@ function [AX,UI] = init_gui(fresh_start)
     if isoctave()
         set(fig,'WindowStyle','normal');
     end
-    set(gui,'name','QPlot 1.0','numbertitle','off');
+    set(gui,'name','QPlot 2.1','numbertitle','off');
     set(gui,'MenuBar','none','ToolBar','none','DockControls','off');
     UI.fig = fig;
 
