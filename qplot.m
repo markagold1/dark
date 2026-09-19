@@ -1091,16 +1091,18 @@ function on_exit_callback(src, event)
     fprintf(1,'------------ QPlot is Exiting -----------------\n');
     screenDPI = get(groot, 'ScreenPixelsPerInch');
     dpiRatio = screenDPI / 96
-    P = get(UI.gui, 'Position')
-    if ~isoctave
-        vNum = sscanf(version, '%d', 1); 
-        if ispc && vNum >= 25
-            % work around dynamic scaling issues
-            P = [P(1) P(2)/3.20 1.25*P(3) 1.25*P(4)];
+    if ~isempty(UI)
+        P = get(UI.gui, 'Position')
+        if ~isoctave
+            vNum = sscanf(version, '%d', 1); 
+            if ispc && vNum >= 25
+                % work around dynamic scaling issues
+                P = [P(1) P(2)/3.20 1.25*P(3) 1.25*P(4)];
+            end
         end
+        qdata_settings_file = get_qdata_pathfile();
+        save(qdata_settings_file,'P');
     end
-    qdata_settings_file = get_qdata_pathfile();
-    save(qdata_settings_file,'P');
     delete(src); 
 
 end % function
