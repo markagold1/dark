@@ -966,7 +966,10 @@ end % function
 function fh = sort_fig_handles(fh)
     hnums = nan(numel(fh),1);
     for kk = 1:numel(hnums)
-        hnums(kk) = get(fh(kk),'Number');
+        n = get(fh(kk),'Number');
+        if ~isempty(n)
+            hnums(kk) = n;
+        end
     end
     [b,I] = sort(hnums);
     fh = fh(I);
